@@ -52,25 +52,6 @@ func (c *conn) beginTxOnce(ctx context.Context) (*sql.Tx, error) {
 	return c.tx, nil
 }
 
-// Implement the "QueryerContext" interface
-func (c *conn) QueryContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Rows, error) {
-	c.Lock()
-	defer c.Unlock()
-
-	tx, err := c.beginTxOnce(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	rs, err := tx.QueryContext(ctx, query, mapNamedArgs(args)...)
-	if err != nil {
-		return nil, err
-	}
-	defer rs.Close()
-
-	return buildRows(rs)
-}
-
 // Implement the "ExecerContext" interface
 func (c *conn) ExecContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Result, error) {
 	c.Lock()
