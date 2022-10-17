@@ -285,25 +285,6 @@ func mapArgs(args []driver.Value) (res []interface{}) {
 	return
 }
 
-func (c *conn) Query(query string, args []driver.Value) (driver.Rows, error) {
-	c.Lock()
-	defer c.Unlock()
-
-	tx, err := c.beginOnce()
-	if err != nil {
-		return nil, err
-	}
-
-	// query rows
-	rs, err := tx.Query(query, mapArgs(args)...)
-	if err != nil {
-		return nil, err
-	}
-	defer rs.Close()
-
-	return buildRows(rs)
-}
-
 type stmt struct {
 	st *sql.Stmt
 }
